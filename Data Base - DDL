@@ -1,0 +1,13 @@
+CREATE DATABASE document_uploader;
+
+USE document_uploader;
+
+CREATE TABLE Document(
+ID INT not null auto_increment,
+NAME CHAR(100) not null,
+EXTENSION CHAR(5) not null,
+PATH CHAR(150) not null,
+TYPE CHAR(5) not null,
+DATE_CREATED DATETIME not null,
+PRIMARY KEY (ID)
+);
