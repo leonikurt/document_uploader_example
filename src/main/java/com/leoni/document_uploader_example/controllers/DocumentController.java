@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.ws.Response;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -32,13 +36,37 @@ public class DocumentController {
     private String rootPath;
 
     @PostMapping("")
-    public ResponseEntity<String> createOrUpdate(@RequestParam MultipartFile file) {
+    public ResponseEntity<String> createOrUpdate(@RequestParam MultipartFile file) throws Exception{
 
         String fileExtension = MimeTypesHelper.getDefaultExt(file.getContentType());
-        if(!fileExtension.equalsIgnoreCase("pdf")){
+
+        if(!fileExtension.equalsIgnoreCase("pdf") && !fileExtension.equalsIgnoreCase("png") &&
+                !fileExtension.equalsIgnoreCase("tiff")){
             return ResponseEntity.status(406).body("Extension " + fileExtension + " not supported.");
         }
 
-        return ResponseEntity.ok(null);
+        doUpload(this.rootPath, "CNH", file, fileExtension);
+
+        return ResponseEntity.ok("Upload successful!");
+    }
+
+    public static String doUpload(String raiz, String diretorio, MultipartFile file, String extension) throws Exception {
+
+        Path diretorioPath = Paths.get(raiz, diretorio);
+
+        Path arquivoPath = diretorioPath.resolve(file.getOriginalFilename());
+
+        try{
+
+            Files.createDirectories(diretorioPath);
+            file.transferTo(arquivoPath.toFile());
+
+        }catch(IOException e) {
+
+            throw new Exception("Failed to upload file, try again later");
+
+        }
+
+        return file.getOriginalFilename();
     }
 }
