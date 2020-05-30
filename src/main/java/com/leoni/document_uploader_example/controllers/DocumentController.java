@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -26,8 +27,6 @@ import java.util.concurrent.TimeoutException;
 @RestController
 @RequestMapping({"/document"})
 public class DocumentController {
-    @Autowired
-    DocumentService documentService;
 
     @Autowired
     DocumentFactory documentFactory;
@@ -46,6 +45,8 @@ public class DocumentController {
         }
 
         doUpload(this.rootPath, "CNH", file, fileExtension);
+
+        Document document = this.documentFactory.create(file, fileExtension, this.rootPath);
 
         return ResponseEntity.ok("Upload successful!");
     }

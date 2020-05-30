@@ -1,9 +1,6 @@
 package com.leoni.document_uploader_example.entities.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -12,6 +9,7 @@ public class Document {
 
     @Id
     @Column(name="ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "NAME")
