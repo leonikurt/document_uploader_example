@@ -1,16 +1,17 @@
 package com.leoni.document_uploader_example.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leoni.document_uploader_example.entities.factories.DocumentFactory;
 import com.leoni.document_uploader_example.entities.models.Document;
+import com.leoni.document_uploader_example.entities.models.requests.FilterRequest;
 import com.leoni.document_uploader_example.services.DocumentService;
 import com.leoni.document_uploader_example.utils.MimeTypesHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.ws.Response;
@@ -18,7 +19,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -31,11 +35,33 @@ public class DocumentController {
     @Autowired
     DocumentFactory documentFactory;
 
+    @Autowired
+    DocumentService documentService;
+
     @Value("${root.path}")
     private String rootPath;
 
+    @RequestMapping(value = "/filter", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> filter(@RequestBody (required=false)FilterRequest filterRequest){
+        List<Document> documentList;
+
+        documentList = this.documentService.filterType(filterRequest.getType(), filterRequest.getInitialDate(),
+                filterRequest.getFinalDate());
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString;
+
+        try {
+            jsonString = mapper.writeValueAsString(documentList);
+        }catch (JsonProcessingException e){
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(jsonString);
+    }
+
     @PostMapping("")
-    public ResponseEntity<String> createOrUpdate(@RequestParam MultipartFile file) throws Exception{
+    public ResponseEntity<String> createFile(@RequestParam MultipartFile file) throws Exception{
 
         String fileExtension = MimeTypesHelper.getDefaultExt(file.getContentType());
 
