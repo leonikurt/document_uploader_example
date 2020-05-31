@@ -48,6 +48,10 @@ public class DocumentController {
         documentList = this.documentService.filterType(filterRequest.getType(), filterRequest.getInitialDate(),
                 filterRequest.getFinalDate());
 
+        if(documentList == null){
+            return ResponseEntity.status(500).body("Initial Date can't be an after date than Final Date");
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         String jsonString;
 

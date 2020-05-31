@@ -43,6 +43,10 @@ public class DocumentServiceImplementation implements DocumentService {
             }
         }
 
+        if(initialDate != null && finalDate != null && initialDate.compareTo(finalDate) > 0 ){
+            return null;
+        }
+
         return this.documentRepository.findFile(type, initialDate, finalDate);
     }
 }
