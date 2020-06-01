@@ -74,16 +74,16 @@ public class DocumentController {
             return ResponseEntity.status(406).body("Extension " + fileExtension + " not supported.");
         }
 
-        doUpload(this.rootPath, "CNH", file, fileExtension);
+        doUpload(this.rootPath, "CNH", file);
 
-        Document document = this.documentFactory.create(file, fileExtension, this.rootPath);
+        this.documentFactory.create(file, fileExtension, this.rootPath);
 
         return ResponseEntity.ok("Upload successful!");
     }
 
-    public static String doUpload(String raiz, String diretorio, MultipartFile file, String extension) throws Exception {
+    public static String doUpload(String rootPath, String directory, MultipartFile file) throws Exception {
 
-        Path diretorioPath = Paths.get(raiz, diretorio);
+        Path diretorioPath = Paths.get(rootPath, directory);
 
         Path arquivoPath = diretorioPath.resolve(file.getOriginalFilename());
 
