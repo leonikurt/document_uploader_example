@@ -74,11 +74,31 @@ public class DocumentController {
             return ResponseEntity.status(406).body("Extension " + fileExtension + " not supported.");
         }
 
-        doUpload(this.rootPath, "CNH", file);
+        String classification = fileClassification(file.getOriginalFilename());
+
+        if(classification == ""){
+            return ResponseEntity.status(406).body("File not supported. Only CNH, RG or CR are allowed");
+        }
+
+        doUpload(this.rootPath, classification, file);
 
         this.documentFactory.create(file, fileExtension, this.rootPath);
 
         return ResponseEntity.ok("Upload successful!");
+    }
+
+    public static String fileClassification(String fileName){
+
+        if(fileName.toLowerCase().contains("cnh")){
+            return "CNH";
+        }else if(fileName.toLowerCase().contains("cr")){
+            return "CR";
+        }else if(fileName.toLowerCase().contains("rg")){
+            return "RG";
+        }else{
+            return "";
+        }
+
     }
 
     public static String doUpload(String rootPath, String directory, MultipartFile file) throws Exception {
