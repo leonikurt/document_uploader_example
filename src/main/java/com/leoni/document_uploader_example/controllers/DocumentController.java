@@ -80,9 +80,9 @@ public class DocumentController {
             return ResponseEntity.status(406).body("File not supported. Only CNH, RG or CR are allowed");
         }
 
-        doUpload(this.rootPath, classification, file);
+        String fileName = doUpload(this.rootPath, classification, file, fileExtension);
 
-        this.documentFactory.create(file, fileExtension, this.rootPath);
+        this.documentFactory.create(fileName, fileExtension, this.rootPath, classification);
 
         return ResponseEntity.ok("Upload successful!");
     }
@@ -101,16 +101,29 @@ public class DocumentController {
 
     }
 
-    public static String doUpload(String rootPath, String directory, MultipartFile file) throws Exception {
+    public static String doUpload(String rootPath, String directory, MultipartFile file, String fileExtension) throws Exception {
 
-        Path diretorioPath = Paths.get(rootPath, directory);
+        Path directoryPath = Paths.get(rootPath, directory);
 
-        Path arquivoPath = diretorioPath.resolve(file.getOriginalFilename());
+        int count = 0;
+
+        String fileName = "imagem_"+directory.toLowerCase()+"_"+String.format("%03d", count)+"."+fileExtension;
+
+        Path filePath = directoryPath.resolve("imagem_"+directory.toLowerCase()+"_"+String.format("%03d", count)+"."+fileExtension);
 
         try{
 
-            Files.createDirectories(diretorioPath);
-            file.transferTo(arquivoPath.toFile());
+            while(true){
+                if(!Files.exists(filePath)){
+                    break;
+                }
+
+                count++;
+                filePath = directoryPath.resolve("imagem_"+directory.toLowerCase()+"_"+String.format("%03d", count)+"."+fileExtension);
+            }
+
+            Files.createDirectories(directoryPath);
+            file.transferTo(filePath.toFile());
 
         }catch(IOException e) {
 
@@ -118,6 +131,6 @@ public class DocumentController {
 
         }
 
-        return file.getOriginalFilename();
+        return "imagem_"+directory.toLowerCase()+"_"+String.format("%03d", count)+"."+fileExtension;
     }
 }

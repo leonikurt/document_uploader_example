@@ -15,15 +15,15 @@ public class DocumentFactory {
     @Autowired
     DocumentService documentService;
 
-    public Document create(MultipartFile file, String fileExtension, String rootPath){
+    public Document create(String fileName, String fileExtension, String rootPath, String classification){
         Document  document = new Document();
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-        document.setName(file.getOriginalFilename());
+        document.setName(fileName);
         document.setExtension(fileExtension);
-        document.setPath(rootPath + "/" + file.getOriginalFilename());
-        document.setType("CNH");
+        document.setPath(rootPath + "/" + classification + "/" + fileName);
+        document.setType(classification);
 
         try {
             document.setDate_created(formatter.parse(formatter.format(new Date())));
